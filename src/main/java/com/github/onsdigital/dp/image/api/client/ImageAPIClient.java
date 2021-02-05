@@ -52,7 +52,8 @@ public class ImageAPIClient implements ImageClient {
     }
 
     /**
-     *  Get a collection of images for the given collection ID.
+     * Get a collection of images for the given collection ID.
+     *
      * @param collectionID
      * @return
      * @throws IOException
@@ -73,6 +74,8 @@ public class ImageAPIClient implements ImageClient {
             switch (statusCode) {
                 case HttpStatus.SC_OK:
                     return parseResponseBody(resp, Images.class);
+                case HttpStatus.SC_UNAUTHORIZED:
+                    throw new UnauthorisedException();
                 default:
                     throw new UnexpectedResponseException(
                             formatErrResponse(req, resp), resp.getStatusLine().getStatusCode());
@@ -97,26 +100,18 @@ public class ImageAPIClient implements ImageClient {
             switch (statusCode) {
                 case HttpStatus.SC_NO_CONTENT:
                     return;
+                case HttpStatus.SC_BAD_REQUEST:
+                    throw new BadRequestException(formatErrResponse(req, resp));
+                case HttpStatus.SC_FORBIDDEN:
+                    throw new ForbiddenException();
+                case HttpStatus.SC_NOT_FOUND:
+                    throw new ImageNotFoundException(formatErrResponse(req, resp));
+                case HttpStatus.SC_UNAUTHORIZED:
+                    throw new UnauthorisedException();
                 default:
-                    validate200ResponseCode(req, resp);
+                    throw new UnexpectedResponseException(
+                            formatErrResponse(req, resp), resp.getStatusLine().getStatusCode());
             }
-        }
-    }
-
-    private void validate200ResponseCode(HttpRequestBase httpRequest, CloseableHttpResponse response)
-            throws ImageNotFoundException, UnexpectedResponseException, UnauthorisedException, ForbiddenException {
-        switch (response.getStatusLine().getStatusCode()) {
-            case HttpStatus.SC_OK:
-                return;
-            case HttpStatus.SC_FORBIDDEN:
-                throw new ForbiddenException();
-            case HttpStatus.SC_NOT_FOUND:
-                throw new ImageNotFoundException(formatErrResponse(httpRequest, response));
-            case HttpStatus.SC_UNAUTHORIZED:
-                throw new UnauthorisedException();
-            default:
-                throw new UnexpectedResponseException(
-                        formatErrResponse(httpRequest, response), response.getStatusLine().getStatusCode());
         }
     }
 
