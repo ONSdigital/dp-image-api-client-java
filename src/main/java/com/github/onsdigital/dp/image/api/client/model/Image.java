@@ -113,16 +113,25 @@ public class Image {
         this.type = type;
     }
 
+    /**
+     *  Represents the licence details of an image
+     */
     public static class Licence {
         private String title;
         private String href;
     }
 
+    /**
+     * Links to self and downloads associated with the image
+     */
     public static class Links {
         public String self;
         public String downloads;
     }
 
+    /**
+     * Represents information about the uploaded image
+     */
     public static class Upload {
         public String path;
     }

@@ -3,6 +3,7 @@ package com.github.onsdigital.dp.image.api.client;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.onsdigital.dp.image.api.client.exception.*;
 import com.github.onsdigital.dp.image.api.client.model.Images;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.*;
@@ -17,6 +18,9 @@ import java.net.URISyntaxException;
 
 import static com.github.onsdigital.logging.v2.event.SimpleEvent.info;
 
+/**
+ * Implementation of an client for the Image API
+ */
 public class ImageAPIClient implements ImageClient {
 
     private final URI imageAPIURL;
@@ -30,9 +34,9 @@ public class ImageAPIClient implements ImageClient {
     /**
      * Create a new instance of ImageAPIClient
      *
-     * @param imageAPIURL      - The URL of the image API
-     * @param serviceAuthToken - The authentication token for the image API
-     * @param client           - The HTTP client to use internally
+     * @param imageAPIURL      The URL of the image API
+     * @param serviceAuthToken The authentication token for the image API
+     * @param client           The HTTP client to use internally
      */
     public ImageAPIClient(String imageAPIURL,
                           String serviceAuthToken,
@@ -43,6 +47,13 @@ public class ImageAPIClient implements ImageClient {
         this.serviceAuthToken = serviceAuthToken;
     }
 
+    /**
+     * Create a new instance of ImageAPIClient with a default Http client
+     *
+     * @param imageAPIURL
+     * @param serviceAuthToken
+     * @throws URISyntaxException
+     */
     public ImageAPIClient(String imageAPIURL, String serviceAuthToken) throws URISyntaxException {
         this(imageAPIURL, serviceAuthToken, createDefaultHttpClient());
     }
@@ -53,14 +64,17 @@ public class ImageAPIClient implements ImageClient {
 
     /**
      * Get a collection of images for the given collection ID.
+     * This limits the results returned to only include images with a matching collecitionID
      *
-     * @param collectionID
-     * @return
+     * @param collectionID A string containing a required collectionID
+     * @return An {@link Images} object containing a list of Image objects
      * @throws IOException
      * @throws ImageAPIException
      */
     @Override
     public Images getImagesWithCollectionId(String collectionID) throws IOException, ImageAPIException {
+
+        validateCollectionID(collectionID);
 
         String path = "/images?collection_id=" + collectionID;
         URI uri = imageAPIURL.resolve(path);
@@ -78,11 +92,18 @@ public class ImageAPIClient implements ImageClient {
                     throw new UnauthorisedException();
                 default:
                     throw new UnexpectedResponseException(
-                            formatErrResponse(req, resp), resp.getStatusLine().getStatusCode());
+                            formatErrResponse(req, resp), statusCode);
             }
         }
     }
 
+    /**
+     * Publish an image by calling the POST /images/{id}/publish endpoint
+     *
+     * @param imageId A string containing the id of a specific image to publish
+     * @throws IOException
+     * @throws ImageAPIException
+     */
     @Override
     public void publishImage(String imageId) throws IOException, ImageAPIException {
 
@@ -110,17 +131,17 @@ public class ImageAPIClient implements ImageClient {
                     throw new UnauthorisedException();
                 default:
                     throw new UnexpectedResponseException(
-                            formatErrResponse(req, resp), resp.getStatusLine().getStatusCode());
+                            formatErrResponse(req, resp), statusCode);
             }
         }
     }
 
-    private void validateImageID(String imageID) {
-        Args.check(isNotEmpty(imageID), "an image id must be provided.");
+    private void validateCollectionID(String collectionID) {
+        Args.check(StringUtils.isNotEmpty(collectionID), "an collection id must be provided.");
     }
 
-    private static boolean isNotEmpty(String str) {
-        return str != null && str.length() > 0;
+    private void validateImageID(String imageID) {
+        Args.check(StringUtils.isNotEmpty(imageID), "an image id must be provided.");
     }
 
     private <T> T parseResponseBody(CloseableHttpResponse response, Class<T> type) throws IOException {
@@ -142,6 +163,11 @@ public class ImageAPIClient implements ImageClient {
         return resp;
     }
 
+    /**
+     * Close the http client used by the ImageAPIClient
+     *
+     * @throws IOException
+     */
     @Override
     public void close() throws IOException {
         client.close();

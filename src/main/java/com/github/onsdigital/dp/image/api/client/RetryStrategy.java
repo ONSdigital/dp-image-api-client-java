@@ -10,6 +10,9 @@ import org.apache.http.protocol.HttpContext;
  */
 public class RetryStrategy implements ServiceUnavailableRetryStrategy {
 
+    public static final int DEFAULT_MAX_RETRIES = 3;
+    public static final int DEFAULT_RETRY_INTERVAL_MS = 20;
+
     private final int maxRetries;
     private final long retryIntervalMs;
 
@@ -19,7 +22,7 @@ public class RetryStrategy implements ServiceUnavailableRetryStrategy {
     }
 
     public RetryStrategy() {
-        this(3, 20);
+        this(DEFAULT_MAX_RETRIES, DEFAULT_RETRY_INTERVAL_MS);
     }
 
     @Override
