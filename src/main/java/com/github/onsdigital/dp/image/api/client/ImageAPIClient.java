@@ -50,8 +50,8 @@ public class ImageAPIClient implements ImageClient {
     /**
      * Create a new instance of ImageAPIClient with a default Http client
      *
-     * @param imageAPIURL
-     * @param serviceAuthToken
+     * @param imageAPIURL       The URL of the image API
+     * @param serviceAuthToken  The authentication token for the image API
      * @throws URISyntaxException
      */
     public ImageAPIClient(String imageAPIURL, String serviceAuthToken) throws URISyntaxException {
@@ -89,7 +89,7 @@ public class ImageAPIClient implements ImageClient {
                 case HttpStatus.SC_OK:
                     return parseResponseBody(resp, Images.class);
                 default:
-                    throw new ImageAPIException(formatErrResponse(req, resp), statusCode);
+                    throw new ImageAPIException(formatErrResponse(req, resp, HttpStatus.SC_OK), statusCode);
             }
         }
     }
@@ -119,7 +119,7 @@ public class ImageAPIClient implements ImageClient {
                 case HttpStatus.SC_NO_CONTENT:
                     return;
                 default:
-                    throw new ImageAPIException(formatErrResponse(req, resp), statusCode);
+                    throw new ImageAPIException(formatErrResponse(req, resp, HttpStatus.SC_NO_CONTENT), statusCode);
             }
         }
     }
@@ -138,10 +138,11 @@ public class ImageAPIClient implements ImageClient {
         return json.readValue(responseString, type);
     }
 
-    private String formatErrResponse(HttpRequestBase httpRequest, CloseableHttpResponse response) {
-        return String.format("the image api returned a %s response for %s",
+    private String formatErrResponse(HttpRequestBase httpRequest, CloseableHttpResponse response, int expectedStatus) {
+        return String.format("the image api returned a %s response for %s (expected %s)",
                 response.getStatusLine().getStatusCode(),
-                httpRequest.getURI());
+                httpRequest.getURI(),
+                expectedStatus);
     }
 
     private CloseableHttpResponse executeRequest(HttpUriRequest req) throws IOException {
