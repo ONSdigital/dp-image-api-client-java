@@ -88,11 +88,8 @@ public class ImageAPIClient implements ImageClient {
             switch (statusCode) {
                 case HttpStatus.SC_OK:
                     return parseResponseBody(resp, Images.class);
-                case HttpStatus.SC_UNAUTHORIZED:
-                    throw new UnauthorisedException();
                 default:
-                    throw new UnexpectedResponseException(
-                            formatErrResponse(req, resp), statusCode);
+                    throw new ImageAPIException(formatErrResponse(req, resp), statusCode);
             }
         }
     }
@@ -121,17 +118,8 @@ public class ImageAPIClient implements ImageClient {
             switch (statusCode) {
                 case HttpStatus.SC_NO_CONTENT:
                     return;
-                case HttpStatus.SC_BAD_REQUEST:
-                    throw new BadRequestException(formatErrResponse(req, resp));
-                case HttpStatus.SC_FORBIDDEN:
-                    throw new ForbiddenException();
-                case HttpStatus.SC_NOT_FOUND:
-                    throw new ImageNotFoundException(formatErrResponse(req, resp));
-                case HttpStatus.SC_UNAUTHORIZED:
-                    throw new UnauthorisedException();
                 default:
-                    throw new UnexpectedResponseException(
-                            formatErrResponse(req, resp), statusCode);
+                    throw new ImageAPIException(formatErrResponse(req, resp), statusCode);
             }
         }
     }

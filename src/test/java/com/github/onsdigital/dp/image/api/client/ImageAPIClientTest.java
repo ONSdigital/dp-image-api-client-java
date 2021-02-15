@@ -90,7 +90,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(UnexpectedResponseException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageClient.getImagesWithCollectionId(collectionID));
     }
 
@@ -106,7 +106,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(UnauthorisedException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageClient.getImagesWithCollectionId(collectionID));
     }
 
@@ -140,7 +140,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(BadRequestException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageAPIClient.publishImage(imageID));
     }
 
@@ -155,7 +155,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(UnauthorisedException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageAPIClient.publishImage(imageID));
     }
 
@@ -170,7 +170,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(ForbiddenException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageAPIClient.publishImage(imageID));
     }
 
@@ -185,7 +185,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(ImageNotFoundException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageAPIClient.publishImage(imageID));
     }
 
@@ -200,7 +200,7 @@ public class ImageAPIClientTest {
 
         // When getImagesWithCollectionId is called
         // Then the expected exception is thrown
-        assertThrows(UnexpectedResponseException.class,
+        assertThrows(ImageAPIException.class,
                 () -> imageAPIClient.publishImage(imageID));
     }
 
