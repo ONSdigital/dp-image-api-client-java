@@ -50,8 +50,8 @@ public class ImageAPIClient implements ImageClient {
     /**
      * Create a new instance of ImageAPIClient with a default Http client
      *
-     * @param imageAPIURL       The URL of the image API
-     * @param serviceAuthToken  The authentication token for the image API
+     * @param imageAPIURL      The URL of the image API
+     * @param serviceAuthToken The authentication token for the image API
      * @throws URISyntaxException
      */
     public ImageAPIClient(String imageAPIURL, String serviceAuthToken) throws URISyntaxException {
@@ -63,21 +63,23 @@ public class ImageAPIClient implements ImageClient {
     }
 
     /**
-     * Get a collection of images for the given collection ID.
-     * This limits the results returned to only include images with a matching collecitionID
+     * Get a collection of images
+     * If the optional collectionId is supplied only images with a matching collection_id are returned.
      *
-     * @param collectionID A string containing a required collectionID
+     * @param collectionID An optional string containing a collectionID to limit the results
      * @return An {@link Images} object containing a list of Image objects
      * @throws IOException
      * @throws ImageAPIException
      */
     @Override
-    public Images getImagesWithCollectionId(String collectionID) throws IOException, ImageAPIException {
+    public Images getImages(String collectionID) throws IOException, ImageAPIException {
 
-        validateCollectionID(collectionID);
+        StringBuilder pathBuilder = new StringBuilder("/images");
+        if (StringUtils.isNotEmpty(collectionID)) {
+            pathBuilder.append("?collection_id=").append(collectionID);
+        }
 
-        String path = "/images?collection_id=" + collectionID;
-        URI uri = imageAPIURL.resolve(path);
+        URI uri = imageAPIURL.resolve(pathBuilder.toString());
 
         HttpGet req = new HttpGet(uri);
         req.addHeader(serviceTokenHeaderName, serviceAuthToken);
@@ -122,10 +124,6 @@ public class ImageAPIClient implements ImageClient {
                     throw new ImageAPIException(formatErrResponse(req, resp, HttpStatus.SC_NO_CONTENT), statusCode);
             }
         }
-    }
-
-    private void validateCollectionID(String collectionID) {
-        Args.check(StringUtils.isNotEmpty(collectionID), "an collection id must be provided.");
     }
 
     private void validateImageID(String imageID) {
