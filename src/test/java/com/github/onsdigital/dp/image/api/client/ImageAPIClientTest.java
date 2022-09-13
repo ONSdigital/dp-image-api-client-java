@@ -1,7 +1,6 @@
 package com.github.onsdigital.dp.image.api.client;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.onsdigital.dp.image.api.client.exception.*;
 import com.github.onsdigital.dp.image.api.client.model.Images;
 import org.apache.http.HttpStatus;
@@ -22,19 +21,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class ImageAPIClientTest {
-
-    private static final ObjectMapper json = new ObjectMapper();
-
-    private static final String serviceTokenHeaderName = "Authorization";
-
-    private static final String imageAPIURL = "http://imageapi:1234";
-    private static final String serviceAuthToken = "67856";
-    private static final String instanceID = "123";
-    private static final String imageID = "321";
-    private static final String collectionID = "col123";
-    private static final String imageTitle = "the image title";
-    private static final String edition = "current";
-    private static final String version = "1";
+    private static final String SERVICE_TOKEN_HEADER_NAME = "Authorization";
+    private static final String IMAGE_API_URL = "http://imageapi:1234";
+    private static final String SERVICE_AUTH_TOKEN = "67856";
+    private static final String IMAGE_ID = "321";
+    private static final String COLLECTION_ID = "col123";
 
     @Test
     public void testImageAPI_invalidURI() {
@@ -47,7 +38,7 @@ public class ImageAPIClientTest {
         // When a new ImageAPIClient is created
         // Then the expected exception is thrown
         assertThrows(URISyntaxException.class,
-                () -> new ImageAPIClient(invalidURI, serviceAuthToken, mockHttpClient));
+                () -> new ImageAPIClient(invalidURI, SERVICE_AUTH_TOKEN, mockHttpClient));
     }
 
     @Test
@@ -72,8 +63,8 @@ public class ImageAPIClientTest {
         assertThat(httpRequest.getURI().getQuery()).isNullOrEmpty();
 
         // Then the request should contain the service token header
-        String actualServiceToken = httpRequest.getFirstHeader(serviceTokenHeaderName).getValue();
-        assertThat(actualServiceToken).isEqualTo(serviceAuthToken);
+        String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
+        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
 
         // Then the response should be whats returned from the image API
         assertThat(actualImages.getCount()).isEqualTo(mockImagesResponse.getCount());
@@ -94,18 +85,18 @@ public class ImageAPIClientTest {
         Images mockImagesResponse = mockImagesResponse(mockHttpResponse);
 
         // When getImages is called with a collection ID
-        Images actualImages = imageAPIClient.getImages(collectionID);
+        Images actualImages = imageAPIClient.getImages(COLLECTION_ID);
 
         assertNotNull(actualImages);
 
         HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then query params in the URI contain the required collection ID
-        assertThat(httpRequest.getURI().getQuery()).contains("collection_id="+collectionID);
+        assertThat(httpRequest.getURI().getQuery()).contains("collection_id="+COLLECTION_ID);
 
         // Then the request should contain the service token header
-        String actualServiceToken = httpRequest.getFirstHeader(serviceTokenHeaderName).getValue();
-        assertThat(actualServiceToken).isEqualTo(serviceAuthToken);
+        String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
+        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
 
         // Then the response should be whats returned from the image API
         assertThat(actualImages.getCount()).isEqualTo(mockImagesResponse.getCount());
@@ -126,7 +117,7 @@ public class ImageAPIClientTest {
         // When getImages is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageClient.getImages(collectionID));
+                () -> imageClient.getImages(COLLECTION_ID));
     }
 
     @Test
@@ -142,7 +133,7 @@ public class ImageAPIClientTest {
         // When getImages is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageClient.getImages(collectionID));
+                () -> imageClient.getImages(COLLECTION_ID));
     }
 
     @Test
@@ -155,13 +146,13 @@ public class ImageAPIClientTest {
         when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
-        imageAPIClient.publishImage(imageID);
+        imageAPIClient.publishImage(IMAGE_ID);
 
         HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then the request should contain the service token header
-        String actualServiceToken = httpRequest.getFirstHeader(serviceTokenHeaderName).getValue();
-        assertThat(actualServiceToken).isEqualTo(serviceAuthToken);
+        String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
+        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
     }
 
     @Test
@@ -176,7 +167,7 @@ public class ImageAPIClientTest {
         // When publishImage is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageAPIClient.publishImage(imageID));
+                () -> imageAPIClient.publishImage(IMAGE_ID));
     }
 
     @Test
@@ -191,7 +182,7 @@ public class ImageAPIClientTest {
         // When publishImage is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageAPIClient.publishImage(imageID));
+                () -> imageAPIClient.publishImage(IMAGE_ID));
     }
 
     @Test
@@ -206,7 +197,7 @@ public class ImageAPIClientTest {
         // When publishImage is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageAPIClient.publishImage(imageID));
+                () -> imageAPIClient.publishImage(IMAGE_ID));
     }
 
     @Test
@@ -221,7 +212,7 @@ public class ImageAPIClientTest {
         // When publishImage is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageAPIClient.publishImage(imageID));
+                () -> imageAPIClient.publishImage(IMAGE_ID));
     }
 
     @Test
@@ -236,11 +227,11 @@ public class ImageAPIClientTest {
         // When publishImage is called
         // Then the expected exception is thrown
         assertThrows(ImageAPIException.class,
-                () -> imageAPIClient.publishImage(imageID));
+                () -> imageAPIClient.publishImage(IMAGE_ID));
     }
 
     private ImageClient getImageClient(CloseableHttpClient mockHttpClient) throws URISyntaxException {
-        return new ImageAPIClient(imageAPIURL, serviceAuthToken, mockHttpClient);
+        return new ImageAPIClient(IMAGE_API_URL, SERVICE_AUTH_TOKEN, mockHttpClient);
     }
 
     private Images mockImagesResponse(CloseableHttpResponse mockHttpResponse) throws JsonProcessingException, UnsupportedEncodingException {
