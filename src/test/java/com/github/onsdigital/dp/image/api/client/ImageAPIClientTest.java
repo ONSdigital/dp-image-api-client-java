@@ -14,11 +14,15 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class ImageAPIClientTest {
     private static final String SERVICE_TOKEN_HEADER_NAME = "Authorization";
@@ -60,17 +64,17 @@ public class ImageAPIClientTest {
         HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then no query params are in the URI
-        assertThat(httpRequest.getURI().getQuery()).isNullOrEmpty();
+        assertNull(httpRequest.getURI().getQuery());
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
-        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
+        assertEquals(SERVICE_AUTH_TOKEN, actualServiceToken);
 
         // Then the response should be whats returned from the image API
-        assertThat(actualImages.getCount()).isEqualTo(mockImagesResponse.getCount());
-        assertThat(actualImages.getTotalCount()).isEqualTo(mockImagesResponse.getTotalCount());
-        assertThat(actualImages.getLimit()).isEqualTo(mockImagesResponse.getLimit());
-        assertThat(actualImages.getOffset()).isEqualTo(mockImagesResponse.getOffset());
+        assertEquals(mockImagesResponse.getCount(), actualImages.getCount());
+        assertEquals(mockImagesResponse.getTotalCount(), actualImages.getTotalCount());
+        assertEquals(mockImagesResponse.getLimit(), actualImages.getLimit());
+        assertEquals(mockImagesResponse.getOffset(), actualImages.getOffset());
     }
 
     @Test
@@ -92,17 +96,17 @@ public class ImageAPIClientTest {
         HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then query params in the URI contain the required collection ID
-        assertThat(httpRequest.getURI().getQuery()).contains("collection_id="+COLLECTION_ID);
+        assertTrue(httpRequest.getURI().getQuery().contains("collection_id="+COLLECTION_ID));
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
-        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
+        assertEquals(SERVICE_AUTH_TOKEN, actualServiceToken);
 
         // Then the response should be whats returned from the image API
-        assertThat(actualImages.getCount()).isEqualTo(mockImagesResponse.getCount());
-        assertThat(actualImages.getTotalCount()).isEqualTo(mockImagesResponse.getTotalCount());
-        assertThat(actualImages.getLimit()).isEqualTo(mockImagesResponse.getLimit());
-        assertThat(actualImages.getOffset()).isEqualTo(mockImagesResponse.getOffset());
+        assertEquals(mockImagesResponse.getCount(), actualImages.getCount());
+        assertEquals(mockImagesResponse.getTotalCount(), actualImages.getTotalCount());
+        assertEquals(mockImagesResponse.getLimit(), actualImages.getLimit());
+        assertEquals(mockImagesResponse.getOffset(), actualImages.getOffset());
     }
 
     @Test
@@ -152,7 +156,7 @@ public class ImageAPIClientTest {
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
-        assertThat(actualServiceToken).isEqualTo(SERVICE_AUTH_TOKEN);
+        assertEquals(SERVICE_AUTH_TOKEN, actualServiceToken);
     }
 
     @Test

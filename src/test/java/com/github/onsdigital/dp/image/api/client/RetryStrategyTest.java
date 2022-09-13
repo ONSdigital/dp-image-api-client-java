@@ -6,7 +6,9 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.junit.jupiter.api.Test;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class RetryStrategyTest {
 
@@ -18,7 +20,7 @@ public class RetryStrategyTest {
     @Test
     void testRetryStrategy_getRetryInterval() {
 
-        assertThat(retryStrategy.getRetryInterval()).isEqualTo(RETRY_INTERVAL);
+        assertEquals(RETRY_INTERVAL, retryStrategy.getRetryInterval());
     }
 
     @Test
@@ -29,7 +31,7 @@ public class RetryStrategyTest {
         HttpContext httpContext = new BasicHttpContext();
 
         boolean retryRequest = retryStrategy.retryRequest(httpResponse, executionCount, httpContext);
-        assertThat(retryRequest).isTrue();
+        assertTrue(retryRequest);
     }
 
     @Test
@@ -40,7 +42,7 @@ public class RetryStrategyTest {
         HttpContext httpContext = new BasicHttpContext();
 
         boolean retryRequest = retryStrategy.retryRequest(httpResponse, executionCount, httpContext);
-        assertThat(retryRequest).isTrue();
+        assertTrue(retryRequest);
     }
 
     @Test
@@ -52,7 +54,7 @@ public class RetryStrategyTest {
 
         boolean retryRequest = retryStrategy.retryRequest(httpResponse, executionCount, httpContext);
 
-        assertThat(retryRequest).isFalse();
+        assertFalse(retryRequest);
     }
 
     @Test
@@ -64,6 +66,6 @@ public class RetryStrategyTest {
 
         boolean retryRequest = retryStrategy.retryRequest(httpResponse, executionCount, httpContext);
 
-        assertThat(retryRequest).isFalse();
+        assertFalse(retryRequest);
     }
 }
