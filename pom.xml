@@ -11,8 +11,8 @@
     <properties>
         <java.version>1.8</java.version>
         <encoding>UTF-8</encoding>
-        <dp.logging.version>v2.0.0-beta.3</dp.logging.version>
-        <jackson.version>2.13.4</jackson.version>
+        <dp.logging.version>v2.0.0-beta.11</dp.logging.version>
+        <jackson.version>2.16.1</jackson.version>
     </properties>
 
     <repositories>
@@ -36,9 +36,8 @@
             <version>2.7</version>
         </dependency>
 
-
         <dependency>
-            <groupId>com.github.ONSdigital</groupId>
+            <groupId>com.github.onsdigital</groupId>
             <artifactId>dp-logging</artifactId>
             <version>${dp.logging.version}</version>
             <scope>provided</scope>
@@ -76,6 +75,33 @@
                     <source>${java.version}</source>
                     <target>${java.version}</target>
                     <encoding>${encoding}</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.sonatype.ossindex.maven</groupId>
+                <artifactId>ossindex-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <executions>
+                    <execution>
+                        <id>audit-dependencies-critical</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>audit</goal>
+                        </goals>
+                        <!-- configuration for mvn validate -->
+                        <configuration>
+                            <!-- if CVSS >= 9.0 (critical) then ERROR else WARN -->
+                            <fail>true</fail>
+                            <cvssScoreThreshold>9.0</cvssScoreThreshold>
+                        </configuration>
+                    </execution>
+                </executions>
+                <!-- configuration for mvn ossindex:audit -->
+                <configuration>
+                    <!-- if CVSS >= 7.0 (high or critical) then ERROR else WARN -->
+                    <fail>true</fail>
+                    <cvssScoreThreshold>7.0</cvssScoreThreshold>
                 </configuration>
             </plugin>
         </plugins>
