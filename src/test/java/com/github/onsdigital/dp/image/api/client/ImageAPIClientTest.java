@@ -3,10 +3,10 @@ package com.github.onsdigital.dp.image.api.client;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.github.onsdigital.dp.image.api.client.exception.*;
 import com.github.onsdigital.dp.image.api.client.model.Images;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
@@ -52,7 +52,7 @@ public class ImageAPIClientTest {
 
         // Given a mock images response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_OK);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         Images mockImagesResponse = mockImagesResponse(mockHttpResponse);
 
@@ -61,10 +61,10 @@ public class ImageAPIClientTest {
 
         assertNotNull(actualImages);
 
-        HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
+        HttpUriRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then no query params are in the URI
-        assertNull(httpRequest.getURI().getQuery());
+        assertNull(httpRequest.getUri().getQuery());
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
@@ -84,7 +84,7 @@ public class ImageAPIClientTest {
 
         // Given a mock images response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_OK);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         Images mockImagesResponse = mockImagesResponse(mockHttpResponse);
 
@@ -93,10 +93,10 @@ public class ImageAPIClientTest {
 
         assertNotNull(actualImages);
 
-        HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
+        HttpUriRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then query params in the URI contain the required collection ID
-        assertTrue(httpRequest.getURI().getQuery().contains("collection_id="+COLLECTION_ID));
+        assertTrue(httpRequest.getUri().getQuery().contains("collection_id="+COLLECTION_ID));
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
@@ -116,7 +116,7 @@ public class ImageAPIClientTest {
 
         // Given a request to the image API that returns a 500
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When getImages is called
         // Then the expected exception is thrown
@@ -132,7 +132,7 @@ public class ImageAPIClientTest {
 
         // Given a request to the image API that returns a 401
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_UNAUTHORIZED);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When getImages is called
         // Then the expected exception is thrown
@@ -147,12 +147,12 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_NO_CONTENT);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         imageAPIClient.publishImage(IMAGE_ID);
 
-        HttpRequestBase httpRequest = captureHttpRequest(mockHttpClient);
+        HttpUriRequestBase httpRequest = captureHttpRequest(mockHttpClient);
 
         // Then the request should contain the service token header
         String actualServiceToken = httpRequest.getFirstHeader(SERVICE_TOKEN_HEADER_NAME).getValue();
@@ -166,7 +166,7 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_BAD_REQUEST);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         // Then the expected exception is thrown
@@ -181,7 +181,7 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the dataset API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_UNAUTHORIZED);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         // Then the expected exception is thrown
@@ -196,7 +196,7 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_FORBIDDEN);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         // Then the expected exception is thrown
@@ -211,7 +211,7 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_NOT_FOUND);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         // Then the expected exception is thrown
@@ -226,7 +226,7 @@ public class ImageAPIClientTest {
 
         // Given a mock image publishing response from the image API
         CloseableHttpResponse mockHttpResponse = MockHttp.response(HttpStatus.SC_INTERNAL_SERVER_ERROR);
-        when(mockHttpClient.execute(any(HttpRequestBase.class))).thenReturn(mockHttpResponse);
+        when(mockHttpClient.execute(any(HttpUriRequestBase.class))).thenReturn(mockHttpResponse);
 
         // When publishImage is called
         // Then the expected exception is thrown
@@ -249,8 +249,8 @@ public class ImageAPIClientTest {
         return responseBody;
     }
 
-    private HttpRequestBase captureHttpRequest(CloseableHttpClient mockHttpClient) throws IOException {
-        ArgumentCaptor<HttpRequestBase> requestCaptor = ArgumentCaptor.forClass(HttpRequestBase.class);
+    private HttpUriRequestBase captureHttpRequest(CloseableHttpClient mockHttpClient) throws IOException {
+        ArgumentCaptor<HttpUriRequestBase> requestCaptor = ArgumentCaptor.forClass(HttpUriRequestBase.class);
         verify(mockHttpClient).execute(requestCaptor.capture());
         return requestCaptor.getValue();
     }

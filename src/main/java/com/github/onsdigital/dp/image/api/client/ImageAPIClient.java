@@ -4,13 +4,19 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.onsdigital.dp.image.api.client.exception.*;
 import com.github.onsdigital.dp.image.api.client.model.Images;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.methods.*;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.Args;
-import org.apache.http.util.EntityUtils;
+
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.classic.methods.HttpPost;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequest;
+import org.apache.hc.client5.http.classic.methods.HttpUriRequestBase;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Args;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.io.entity.EntityUtils;
+import org.apache.hc.core5.http.ParseException;
 
 import java.io.IOException;
 import java.net.URI;
@@ -59,7 +65,7 @@ public class ImageAPIClient implements ImageClient {
     }
 
     private static CloseableHttpClient createDefaultHttpClient() {
-        return HttpClients.custom().setServiceUnavailableRetryStrategy(new RetryStrategy()).build();
+        return HttpClients.custom().setRetryStrategy(new RetryStrategy()).build();
     }
 
     /**
@@ -85,7 +91,7 @@ public class ImageAPIClient implements ImageClient {
         req.addHeader(serviceTokenHeaderName, serviceAuthToken);
 
         try (CloseableHttpResponse resp = executeRequest(req)) {
-            int statusCode = resp.getStatusLine().getStatusCode();
+            int statusCode = resp.getCode();
 
             switch (statusCode) {
                 case HttpStatus.SC_OK:
@@ -93,6 +99,8 @@ public class ImageAPIClient implements ImageClient {
                 default:
                     throw new ImageAPIException(formatErrResponse(req, resp, HttpStatus.SC_OK), statusCode);
             }
+        } catch (ParseException e) {
+            throw new ImageAPIException("failed to parse response from image api", HttpStatus.SC_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -115,7 +123,7 @@ public class ImageAPIClient implements ImageClient {
         req.addHeader(serviceTokenHeaderName, serviceAuthToken);
 
         try (CloseableHttpResponse resp = executeRequest(req)) {
-            int statusCode = resp.getStatusLine().getStatusCode();
+            int statusCode = resp.getCode();
 
             switch (statusCode) {
                 case HttpStatus.SC_NO_CONTENT:
@@ -130,23 +138,31 @@ public class ImageAPIClient implements ImageClient {
         Args.check(StringUtils.isNotEmpty(imageID), "an image id must be provided.");
     }
 
-    private <T> T parseResponseBody(CloseableHttpResponse response, Class<T> type) throws IOException {
+    private <T> T parseResponseBody(CloseableHttpResponse response, Class<T> type) throws IOException, ParseException {
         HttpEntity entity = response.getEntity();
         String responseString = EntityUtils.toString(entity);
         return json.readValue(responseString, type);
     }
 
-    private String formatErrResponse(HttpRequestBase httpRequest, CloseableHttpResponse response, int expectedStatus) {
-        return String.format("the image api returned a %s response for %s (expected %s)",
-                response.getStatusLine().getStatusCode(),
-                httpRequest.getURI(),
-                expectedStatus);
+   private String formatErrResponse(HttpUriRequestBase httpRequest, CloseableHttpResponse response, int expectedStatus) {
+        int responseCode = response.getCode();
+
+        try {
+            String requestURI = httpRequest.getUri().toString();
+            return String.format("the image api returned a %s response for %s",
+                            responseCode,
+                            requestURI);
+        } catch (URISyntaxException e) {
+            return String.format("the image api returned a %s response for %s",
+                responseCode,
+                httpRequest.getRequestUri());
+        }
     }
 
     private CloseableHttpResponse executeRequest(HttpUriRequest req) throws IOException {
-        info().beginHTTP(req).log("executing image-api request");
+        info().beginHTTP(req).log("executing image api request");
         CloseableHttpResponse resp = client.execute(req);
-        info().endHTTP(req, resp).log("execute image-api request compeleted");
+        info().endHTTP(req, resp).log("execute image api request completed");
         return resp;
     }
 
