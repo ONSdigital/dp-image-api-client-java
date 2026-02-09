@@ -23,6 +23,6 @@ EOF
 # Secure the file
 chmod 600 ~/.m2/settings.xml
 
-pushd dp-image-api-java-client
+pushd dp-image-api-client-java
   make audit
 popd
