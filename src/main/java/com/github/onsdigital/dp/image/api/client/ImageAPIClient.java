@@ -147,16 +147,11 @@ public class ImageAPIClient implements ImageClient {
    private String formatErrResponse(HttpUriRequestBase httpRequest, CloseableHttpResponse response, int expectedStatus) {
         int responseCode = response.getCode();
 
-        try {
-            String requestURI = httpRequest.getUri().toString();
-            return String.format("the image api returned a %s response for %s",
-                            responseCode,
-                            requestURI);
-        } catch (URISyntaxException e) {
-            return String.format("the image api returned a %s response for %s",
-                responseCode,
-                httpRequest.getRequestUri());
-        }
+        String requestURI = httpRequest.getRequestUri();
+        return String.format("the image api returned a %s response for %s (expected %s)",
+            responseCode,
+            requestURI,
+            expectedStatus);
     }
 
     private CloseableHttpResponse executeRequest(HttpUriRequest req) throws IOException {
