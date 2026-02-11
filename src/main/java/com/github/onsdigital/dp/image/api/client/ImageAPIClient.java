@@ -161,6 +161,9 @@ public class ImageAPIClient implements ImageClient {
 
     private CloseableHttpResponse executeRequest(HttpUriRequest req) throws IOException {
         info().beginHTTP(req).log("executing image api request");
+        // TODO: remove reliance on CloseableHttpClient.execute
+        // as it is deprecated in HttpClient 5.4.0 - instead
+        // use HttpClient.execute with a ResponseHandler
         CloseableHttpResponse resp = client.execute(req);
         info().endHTTP(req, resp).log("execute image api request completed");
         return resp;
